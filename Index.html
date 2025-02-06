@@ -191,15 +191,59 @@
             chatMessageFiles[chatId] = entry;
         }
 
-        function formatTimestamp(timestamp) {
+        function formatTimestamp(timestamp) {            
             if (timestamp == undefined) {
                 return "";
-            }
+            }           
 
-            // Format is "Thursday, July 14, 2016 at 5:04:34 PM UTC"
-            timestamp = timestamp.replace(' at ', ' ')
+            // Format is "Thursday, July 14, 2016 at 5:04:34 PM UTC"            
+            //timestamp = timestamp.replace(' at ', ' ')
+            timestamp = converterDataPortugues(timestamp)
             const date = new Date(timestamp);
             return date.toLocaleString();
+        }
+
+        function converterDataPortugues(dataString) {
+            // Mapeamento dos meses em português
+            const meses = {
+                'janeiro': 0,
+                'fevereiro': 1,
+                'março': 2,
+                'abril': 3,
+                'maio': 4,
+                'junho': 5,
+                'julho': 6,
+                'agosto': 7,
+                'setembro': 8,
+                'outubro': 9,
+                'novembro': 10,
+                'dezembro': 11
+            };
+
+            // Remove o dia da semana e separa o resto
+            const semDiaSemana = dataString.split(', ')[1];
+            
+            // Separa a data e hora
+            const [data, hora] = semDiaSemana.split(' às ');
+            
+            // Processa a data
+            const [dia, mes, ano] = data.split(' de ');
+            
+            // Processa a hora
+            const [horaStr] = hora.split(' UTC');
+            const [horas, minutos, segundos] = horaStr.split(':');
+            
+            // Cria o objeto Date
+            const date = new Date(Date.UTC(
+                parseInt(ano),
+                meses[mes.toLowerCase()],
+                parseInt(dia),
+                parseInt(horas),
+                parseInt(minutos),
+                parseInt(segundos)
+            ));
+            
+            return date;
         }
 
         async function addToFileCache(itemPath, entry) {
@@ -315,7 +359,7 @@
         }
 
         async function listFilesRecursive(directoryHandle, chatList, prefix = '') {
-            console.log("Looking for chats in ", directoryHandle.name);
+            //console.log("Looking for chats in ", directoryHandle.name);
             for await (const entry of directoryHandle.values()) {
                 const itemPath = `${prefix}${entry.name}`;
                                 
